@@ -1,30 +1,27 @@
-    package indi.morven;
+package indi.morven.connect2qq;
 
-    import cn.hutool.json.JSONObject;
-    import cn.hutool.json.JSONUtil;
+import cn.hutool.http.Header;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 
-    public class Main {
-        public static void main(String[] args) throws Exception {
+import java.net.URI;
+import java.net.URISyntaxException;
 
-            //apiHttpDemo.getAccessToken();
+public class Main {
+    public static void main(String[] args) throws URISyntaxException {
+        //请求获取websocket链接
+        HttpResponse gateway = HttpRequest.get("https://sandbox.api.sgroup.qq.com/gateway ")
+                .header(Header.AUTHORIZATION,"Bot 102073158.0wE108Lwimm5pIy1krGpAJ6XOd72u75E")
+                .execute();
+        String wssUrl = gateway.body();
+        JSONObject json= JSONUtil.parseObj(wssUrl);
+        String url = json.get("url").toString();
 
-            //Cli cli = new Cli();
-            //cli.botCli();
+        //启动websocket客户端，建立连接
+        webSocket2QQ qqBotEventSocket = new webSocket2QQ(new URI(url));
+        qqBotEventSocket.connect();
 
-            String json ="{\n" +
-                    "  \"op\": 2,\n" +
-                    "  \"d\": {\n" +
-                    "    \"token\": \"token string\",\n" +
-                    "    \"intents\": 513,\n" +
-                    "    \"shard\": [0, 4],\n" +
-                    "    \"properties\": {\n" +
-                    "      \"$os\": \"linux\",\n" +
-                    "      \"$browser\": \"my_library\",\n" +
-                    "      \"$device\": \"my_library\"\n" +
-                    "    }\n" +
-                    "  }\n" +
-                    "}";
-            JSONObject jsonObject = JSONUtil.parseObj(json);
-            System.out.println(jsonObject.get("d"));
-        }
     }
+}
