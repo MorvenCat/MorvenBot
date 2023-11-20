@@ -6,6 +6,8 @@ public class RootConfigBean {
 
 
     public RootConfigBean() {
+        this.baseConfigBean = new BaseConfigBean();
+        this.authConfig = new AuthConfigBean();
     }
 
     public RootConfigBean(BaseConfigBean baseConfigBean, AuthConfigBean authConfig) {
@@ -15,6 +17,7 @@ public class RootConfigBean {
 
     /**
      * 获取
+     *
      * @return baseConfigBean
      */
     public BaseConfigBean getBaseConfigBean() {
@@ -23,6 +26,7 @@ public class RootConfigBean {
 
     /**
      * 设置
+     *
      * @param baseConfigBean
      */
     public void setBaseConfigBean(BaseConfigBean baseConfigBean) {
@@ -31,6 +35,7 @@ public class RootConfigBean {
 
     /**
      * 获取
+     *
      * @return authConfig
      */
     public AuthConfigBean getAuthConfig() {
@@ -39,13 +44,11 @@ public class RootConfigBean {
 
     /**
      * 设置
+     *
      * @param authConfig
      */
     public void setAuthConfig(AuthConfigBean authConfig) {
         this.authConfig = authConfig;
     }
-
-    public String toString() {
-        return "RootConfigBean{baseConfigBean = " + baseConfigBean + ", authConfig = " + authConfig + "}";
-    }
 }
+
