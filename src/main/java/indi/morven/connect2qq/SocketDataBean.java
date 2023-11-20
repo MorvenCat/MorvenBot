@@ -6,8 +6,9 @@ import java.util.Map;
 
 public class SocketDataBean {
     /*
-        op 指的是 opcode，全部 opcode 列表参考 opcode。
-        s 下行消息都会有一个序列号，标识消息的唯一性，客户端需要再发送心跳的时候，携带客户端收到的最新的s。
+        op 指的是 opcode，全部 opcode 列表参考 opcode
+        (https://bot.q.qq.com/wiki/develop/api-231017/dev-prepare/interface-framework/event-emit.html#websocket-%E6%96%B9%E5%BC%8F)。
+        s下行消息都会有一个序列号，标识消息的唯一性，客户端需要再发送心跳的时候，携带客户端收到的最新的s。
         t和d 主要是用在op为 0 Dispatch 的时候，
         t 代表事件类型，
         d 代表事件内容，
@@ -54,13 +55,10 @@ public class SocketDataBean {
         //d 内部定义
         public static class d {
             @SerializedName("heartbeat_interval")
-            private int heartBeatInterval;
-
-
+            private int heartBeatInterval;  //获取心跳周期
             public int getHeartBeatInterval() {
                 return heartBeatInterval;
             }
-
             public void setHeartBeatInterval(int heartBeatInterval) {
                 this.heartBeatInterval = heartBeatInterval;
             }
@@ -99,13 +97,37 @@ public class SocketDataBean {
             private int[] id;
 
 
-            private static class user {
+            public static class user {
                 @SerializedName("id")
                 private String id;
                 @SerializedName("username")
                 private String username;
                 @SerializedName("bot")
                 private String bot;
+
+                public String getId() {
+                    return id;
+                }
+
+                public void setId(String id) {
+                    this.id = id;
+                }
+
+                public String getUsername() {
+                    return username;
+                }
+
+                public void setUsername(String username) {
+                    this.username = username;
+                }
+
+                public String getBot() {
+                    return bot;
+                }
+
+                public void setBot(String bot) {
+                    this.bot = bot;
+                }
             }
 
             public String getVersion() {

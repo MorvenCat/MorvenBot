@@ -40,8 +40,9 @@ public class webSocket2QQ extends WebSocketClient {
     public void onMessage(String receiveMessage) {
         logger.debug("收到消息"+receiveMessage);
 
-        //反序列化服务端消息，获取opcode值进行判断
-        SocketDataBean.BaseMessage baseMessage = gson.fromJson(receiveMessage, SocketDataBean.BaseMessage.class);
+        //获取opcode值进行判断
+        SocketDataBean.BaseMessage baseMessage
+                = gson.fromJson(receiveMessage, SocketDataBean.BaseMessage.class);
         int opCode = baseMessage.getOpCode();
 
 
