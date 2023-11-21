@@ -8,7 +8,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.*;
 
-public class ConfigReader {
+public class CheckConfig {
     private static final Yaml yaml = new Yaml();
     private static final String FILEPATH = "config.yml";
     private static final String COMMENT = """
@@ -51,11 +51,19 @@ public class ConfigReader {
 
     private static void readConfig(File configFile) {
         try (FileReader reader = new FileReader(configFile)) {
+            MorvenBotMain.LOGGER.info("配置初始化");
 
             RootConfigBean config = yaml.loadAs(reader,RootConfigBean.class);
 
+            GlobalConfig.setAppSecret(config.getAuthConfig().getAppSecret());
+            GlobalConfig.setAppId(config.getAuthConfig().getAppId());
+            GlobalConfig.setBotQQ(config.getAuthConfig().getBotQQ());
+            GlobalConfig.setToken(config.getAuthConfig().getToken());
+            GlobalConfig.setIsShard(config.getBaseConfigBean().isIsShard());
+            GlobalConfig.setDebug_mode(config.getBaseConfigBean().isDebug_mode());
+            GlobalConfig.setAutoReconnect(config.getBaseConfigBean().isAutoReconnect());
 
-
+            GlobalConfig.toString
 
         } catch (YAMLException e) {
             MorvenBotMain.LOGGER.error("配置文件里好像有什么奇怪的东西呢，快看看是怎么个事\n" + e.getMessage());

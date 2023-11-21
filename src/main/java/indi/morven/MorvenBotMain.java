@@ -4,7 +4,7 @@ package indi.morven;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static indi.morven.config.ConfigReader.config;
+import static indi.morven.config.CheckConfig.config;
 
 public class MorvenBotMain {
     public static final String version = "1.0.0";

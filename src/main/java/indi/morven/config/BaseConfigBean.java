@@ -2,8 +2,8 @@ package indi.morven.config;
 
 public class BaseConfigBean {
     private boolean isShard;
-    public boolean debug_mode;
-    public boolean autoReconnect;
+    private boolean debug_mode;
+    private boolean autoReconnect;
 
 
     public BaseConfigBean() {
