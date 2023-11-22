@@ -63,8 +63,6 @@ public class CheckConfig {
             GlobalConfig.setDebug_mode(config.getBaseConfigBean().isDebug_mode());
             GlobalConfig.setAutoReconnect(config.getBaseConfigBean().isAutoReconnect());
 
-            GlobalConfig.toString
-
         } catch (YAMLException e) {
             MorvenBotMain.LOGGER.error("配置文件里好像有什么奇怪的东西呢，快看看是怎么个事\n" + e.getMessage());
         } catch (IOException | ClassCastException e) {

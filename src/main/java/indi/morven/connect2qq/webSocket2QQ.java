@@ -3,8 +3,9 @@
 package indi.morven.connect2qq;
 
 import com.google.gson.Gson;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import indi.morven.Event.EventHandler;
+import indi.morven.MorvenBotMain;
+import indi.morven.config.GlobalConfig;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -16,11 +17,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class webSocket2QQ extends WebSocketClient {
-    private static final Logger logger = LogManager.getLogger(webSocket2QQ.class); //日志
     private final ScheduledExecutorService heartBeatTask
             = Executors.newSingleThreadScheduledExecutor(); //定时任务
     private String session_id = null;
-    private final String token = "Bot 102073158.0wE108Lwimm5pIy1krGpAJ6XOd72u75E";
+    private final String token = GlobalConfig.getAUTHORIZATION();
     private final Gson gson = new Gson();
     private int heartBeatInterval = 0;  //心跳周期
     private int s = 0;  //消息序列号
@@ -38,7 +38,7 @@ public class webSocket2QQ extends WebSocketClient {
 
     @Override
     public void onMessage(String receiveMessage) {
-        logger.debug("收到消息"+receiveMessage);
+        MorvenBotMain.LOGGER.debug("收到消息" + receiveMessage);
 
         //获取opcode值进行判断
         SocketDataBean.BaseMessage baseMessage
@@ -47,7 +47,7 @@ public class webSocket2QQ extends WebSocketClient {
 
 
         switch (opCode) {
-            case 0:
+            case 0 -> {
                 //服务端消息推送，事件
                 SocketDataBean.EventMessage eventMessage = gson.fromJson(receiveMessage, SocketDataBean.EventMessage.class);
                 //获取消息序列号，更新心跳
@@ -55,63 +55,65 @@ public class webSocket2QQ extends WebSocketClient {
                 //获取事件类型，并进行判断
                 String t = eventMessage.getT();
                 switch (t) {
-                    case "READY":
+                    case "READY" -> {
                         //更新sessionId信息
                         session_id = eventMessage.getD().getSession_id();
                         //启用定时发送心跳包
                         startHeartbeatTask();
-                        break;
-                    case "RESUMED":
+                    }
+                    case "RESUMED" -> {
                         //重连后消息补发完成
-                        break;
-                    case "2":
-                        break;
-                    case "3":
-                        break;
+                        MorvenBotMain.LOGGER.info("重连成功~消息已补发");
+                    }
+                    default -> {
+                        //其他事件处理
+                        EventHandler.handleEvent(t);
+                    }
                 }
-                break;
-            case 7:
+            }
+            case 7 -> {
                 //服务端通知客户端重新连接
-                logger.warn("服务器请求重连！");
+                MorvenBotMain.LOGGER.warn("服务器请求重连！");
                 Resume();
-                break;
-            case 9:
-                if (isResumeFlag){
-                    logger.warn("重连失败！请检查网络状况！");
-                }else {
-                    logger.warn("登陆失败！请确认登录信息！");
+            }
+            case 9 -> {
+                if (isResumeFlag) {
+                    MorvenBotMain.LOGGER.warn("重连失败！请检查网络状况！");
+                } else {
+                    MorvenBotMain.LOGGER.warn("登陆失败！请确认登录信息！");
                 }
-
-                break;
-            case 10:
+            }
+            case 10 -> {
                 //当客户端与网关建立ws连接后，网关发送的第一条消息
+                MorvenBotMain.LOGGER.info("登录成功！");
                 heartBeatInterval = getHeartBeatInterval(receiveMessage);
-                break;
-            case 11:
+            }
+            case 11 ->
                 //发送心跳成功后收到该消息
-                logger.debug("收到心跳数据包");
-                break;
-            case 12:
+                    MorvenBotMain.LOGGER.debug("收到心跳数据包");
+            case 12 -> {
                 //仅用于http回调。代表机器人收到了平台推送数据
-                break;
-
+            }
         }
     }
 
     private void Resume() {
         // 重连
-        logger.warn("正在重连至QQ服务器！");
+        MorvenBotMain.LOGGER.warn("正在重连至QQ服务器！");
         isResumeFlag = true;    //标记为断线重连
 
         SocketDataBean.ResumeMessage.d resumeData = new SocketDataBean.ResumeMessage.d();
-        resumeData.setSessionId(session_id);
-        resumeData.setToken(token);
-        resumeData.setS(s);
+        resumeData.setSessionId(session_id);//会话id
+        resumeData.setToken(token);//token
+        resumeData.setS(s);//消息序列号，用于重连补发消息
 
         SocketDataBean.ResumeMessage resumeMessage = new SocketDataBean.ResumeMessage(6);
         resumeMessage.setD(resumeData);
 
         String json = gson.toJson(resumeMessage);
+        System.out.println(json);
+
+        MorvenBotMain.LOGGER.info("请求重连~");
         send(json);
 
     }
@@ -170,12 +172,12 @@ public class webSocket2QQ extends WebSocketClient {
     @Override
     public void onClose(int i, String s, boolean b) {
         heartBeatTask.shutdown();//关闭定时任务
-        logger.info("连接断开");
+        MorvenBotMain.LOGGER.info("连接断开");
     }
 
     @Override
     public void onError(Exception e) {
-        logger.error("连接出错", e);
+        MorvenBotMain.LOGGER.error("连接出错", e);
         Resume();
     }
 

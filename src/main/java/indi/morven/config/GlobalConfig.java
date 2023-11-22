@@ -25,6 +25,7 @@ public class GlobalConfig {
 
     /**
      * 获取
+     *
      * @return botQQ
      */
     public static String getBotQQ() {
@@ -33,6 +34,7 @@ public class GlobalConfig {
 
     /**
      * 设置
+     *
      * @param botQQ
      */
     public static void setBotQQ(String botQQ) {
@@ -41,6 +43,7 @@ public class GlobalConfig {
 
     /**
      * 获取
+     *
      * @return appId
      */
     public static String getAppId() {
@@ -49,6 +52,7 @@ public class GlobalConfig {
 
     /**
      * 设置
+     *
      * @param appId
      */
     public static void setAppId(String appId) {
@@ -57,6 +61,7 @@ public class GlobalConfig {
 
     /**
      * 获取
+     *
      * @return token
      */
     public static String getToken() {
@@ -65,6 +70,7 @@ public class GlobalConfig {
 
     /**
      * 设置
+     *
      * @param token
      */
     public static void setToken(String token) {
@@ -73,6 +79,7 @@ public class GlobalConfig {
 
     /**
      * 获取
+     *
      * @return appSecret
      */
     public static String getAppSecret() {
@@ -81,6 +88,7 @@ public class GlobalConfig {
 
     /**
      * 设置
+     *
      * @param appSecret
      */
     public static void setAppSecret(String appSecret) {
@@ -89,6 +97,7 @@ public class GlobalConfig {
 
     /**
      * 获取
+     *
      * @return isShard
      */
     public static boolean isIsShard() {
@@ -97,6 +106,7 @@ public class GlobalConfig {
 
     /**
      * 设置
+     *
      * @param isShard
      */
     public static void setIsShard(boolean isShard) {
@@ -105,6 +115,7 @@ public class GlobalConfig {
 
     /**
      * 获取
+     *
      * @return debug_mode
      */
     public static boolean isDebug_mode() {
@@ -113,6 +124,7 @@ public class GlobalConfig {
 
     /**
      * 设置
+     *
      * @param debug_mode
      */
     public static void setDebug_mode(boolean debug_mode) {
@@ -121,6 +133,7 @@ public class GlobalConfig {
 
     /**
      * 获取
+     *
      * @return autoReconnect
      */
     public static boolean isAutoReconnect() {
@@ -129,13 +142,18 @@ public class GlobalConfig {
 
     /**
      * 设置
+     *
      * @param autoReconnect
      */
     public static void setAutoReconnect(boolean autoReconnect) {
         GlobalConfig.autoReconnect = autoReconnect;
     }
 
-    public String toString() {
+    public static String getAUTHORIZATION() {
+        return new StringBuilder().append("Bot ").append(GlobalConfig.getAppId() + ".").append(GlobalConfig.getToken()).toString();
+    }
+
+    public static String static2String() {
         return "GlobalConfig{botQQ = " + botQQ + ", appId = " + appId + ", token = " + token + ", appSecret = " + appSecret + ", isShard = " + isShard + ", debug_mode = " + debug_mode + ", autoReconnect = " + autoReconnect + "}";
     }
 }

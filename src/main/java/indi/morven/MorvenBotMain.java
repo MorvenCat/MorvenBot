@@ -11,6 +11,6 @@ public class MorvenBotMain {
     public static final Logger LOGGER = LogManager.getLogger("MorvenBot");
 
     public static void main(String[] args) {
-        config();
+
     }
 }
