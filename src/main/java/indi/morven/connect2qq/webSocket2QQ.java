@@ -54,6 +54,7 @@ public class webSocket2QQ extends WebSocketClient {
         int opCode = baseMessage.getOpCode();
 
 
+
         switch (opCode) {
             case 0 -> {
                 //服务端消息推送，事件
@@ -62,6 +63,7 @@ public class webSocket2QQ extends WebSocketClient {
                 s = eventMessage.getS();
                 //获取事件类型，并进行判断
                 String t = eventMessage.getT();
+
                 switch (t) {
                     case "READY" -> {
                         //更新sessionId信息
@@ -95,7 +97,11 @@ public class webSocket2QQ extends WebSocketClient {
             }
             case 10 -> {
                 //当客户端与网关建立ws连接后，网关发送的第一条消息
-                MorvenBotMain.LOGGER.info("登录成功！");
+                if (isResumeFlag){
+                    MorvenBotMain.LOGGER.debug("重启心跳机制！");
+                }else {
+                    MorvenBotMain.LOGGER.info("登录成功！");
+                }
                 heartBeatInterval = getHeartBeatInterval(receiveMessage);
             }
             case 11 ->
@@ -180,9 +186,17 @@ public class webSocket2QQ extends WebSocketClient {
     @Override
     public void onClose(int i, String s, boolean b) {
         if (isResumeFlag) {
-            //服务器请求重连
             MorvenBotMain.LOGGER.info("正在重新连接到QQ服务器！");
-            reconnect();
+            heartBeatTask.shutdown();//关闭定时任务
+
+            // 使用线程池来处理重连任务
+            Executors.newSingleThreadExecutor().submit(() -> {
+                try {
+                    reconnect();
+                } catch (Exception e) {
+                    MorvenBotMain.LOGGER.error("重连失败: " + e.getMessage(), e);
+                }
+            });
 
         } else {
 

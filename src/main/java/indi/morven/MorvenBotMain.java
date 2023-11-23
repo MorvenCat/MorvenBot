@@ -1,7 +1,7 @@
 package indi.morven;
 
 
-import indi.morven.QQbotApi.GetWssURL;
+import indi.morven.connect2qq.GetWssURL;
 import indi.morven.config.GlobalConfig;
 import indi.morven.connect2qq.webSocket2QQ;
 import org.apache.logging.log4j.LogManager;

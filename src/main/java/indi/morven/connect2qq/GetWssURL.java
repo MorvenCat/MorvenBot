@@ -1,4 +1,4 @@
-package indi.morven.QQbotApi;
+package indi.morven.connect2qq;
 
 import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
