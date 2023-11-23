@@ -2,6 +2,7 @@ package indi.morven;
 
 
 import indi.morven.QQbotApi.GetWssURL;
+import indi.morven.config.GlobalConfig;
 import indi.morven.connect2qq.webSocket2QQ;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +22,7 @@ public class MorvenBotMain {
         //启动websocket客户端，建立连接
         webSocket2QQ qqBotEventSocket = null;
         try {
-            qqBotEventSocket = new webSocket2QQ(new URI(GetWssURL.wssUrl()));
+            qqBotEventSocket = new webSocket2QQ(new URI(GetWssURL.wssUrl(GlobalConfig.getAUTHORIZATION())));
         } catch (URISyntaxException e) {
             LOGGER.error("与QQ服务器建立连接失败，请检查网络连接",e);
         }

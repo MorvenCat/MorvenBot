@@ -32,8 +32,16 @@ public class webSocket2QQ extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
-        //登录鉴权
-        identifyJson();
+        MorvenBotMain.LOGGER.info("与服务器建立socket连接！");
+
+        //如果是重新连接
+        if (isResumeFlag) {
+            //重连鉴权
+            Resume();
+        } else {
+            //登录鉴权
+            identifyJson();
+        }
     }
 
     @Override
@@ -64,6 +72,7 @@ public class webSocket2QQ extends WebSocketClient {
                     case "RESUMED" -> {
                         //重连后消息补发完成
                         MorvenBotMain.LOGGER.info("重连成功~消息已补发");
+                        isResumeFlag = false; //重连标记归位
                     }
                     default -> {
                         //其他事件处理
@@ -74,7 +83,8 @@ public class webSocket2QQ extends WebSocketClient {
             case 7 -> {
                 //服务端通知客户端重新连接
                 MorvenBotMain.LOGGER.warn("服务器请求重连！");
-                Resume();
+                isResumeFlag = true;
+
             }
             case 9 -> {
                 if (isResumeFlag) {
@@ -99,9 +109,6 @@ public class webSocket2QQ extends WebSocketClient {
 
     private void Resume() {
         // 重连
-        MorvenBotMain.LOGGER.warn("正在重连至QQ服务器！");
-        isResumeFlag = true;    //标记为断线重连
-
         SocketDataBean.ResumeMessage.d resumeData = new SocketDataBean.ResumeMessage.d();
         resumeData.setSessionId(session_id);//会话id
         resumeData.setToken(token);//token
@@ -111,9 +118,9 @@ public class webSocket2QQ extends WebSocketClient {
         resumeMessage.setD(resumeData);
 
         String json = gson.toJson(resumeMessage);
-        System.out.println(json);
 
-        MorvenBotMain.LOGGER.info("请求重连~");
+        //发送重连信息！
+        MorvenBotMain.LOGGER.info("正在请求恢复消息！");
         send(json);
 
     }
@@ -169,10 +176,20 @@ public class webSocket2QQ extends WebSocketClient {
 
     }
 
+
     @Override
     public void onClose(int i, String s, boolean b) {
-        heartBeatTask.shutdown();//关闭定时任务
-        MorvenBotMain.LOGGER.info("连接断开");
+        if (isResumeFlag) {
+            //服务器请求重连
+            MorvenBotMain.LOGGER.info("正在重新连接到QQ服务器！");
+            reconnect();
+
+        } else {
+
+            heartBeatTask.shutdown();//关闭定时任务
+            MorvenBotMain.LOGGER.info("连接断开");
+        }
+
     }
 
     @Override
