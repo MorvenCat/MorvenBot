@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class webSocket2QQ extends WebSocketClient {
-    private final ScheduledExecutorService heartBeatTask
+    private ScheduledExecutorService heartBeatTask
             = Executors.newSingleThreadScheduledExecutor(); //定时任务
     private String session_id = null;
     private final String token = GlobalConfig.getAUTHORIZATION();
@@ -25,6 +25,14 @@ public class webSocket2QQ extends WebSocketClient {
     private int heartBeatInterval = 0;  //心跳周期
     private int s = 0;  //消息序列号
     private boolean isResumeFlag = false;
+
+    public boolean isResumeFlag() {
+        return isResumeFlag;
+    }
+
+    public void setResumeFlag(boolean resumeFlag) {
+        isResumeFlag = resumeFlag;
+    }
 
     public webSocket2QQ(URI serverUri) {
         super(serverUri);
@@ -54,16 +62,23 @@ public class webSocket2QQ extends WebSocketClient {
         int opCode = baseMessage.getOpCode();
 
 
-
         switch (opCode) {
+
             case 0 -> {
                 //服务端消息推送，事件
-                SocketDataBean.EventMessage eventMessage = gson.fromJson(receiveMessage, SocketDataBean.EventMessage.class);
-                //获取消息序列号，更新心跳
-                s = eventMessage.getS();
-                //获取事件类型，并进行判断
-                String t = eventMessage.getT();
+                SocketDataBean.EventMessage eventMessage = null;
+                //记录事件类型
+                String t;
+                if (isResumeFlag) {
+                    t = "RESUMED";
+                } else {
+                    eventMessage = gson.fromJson(receiveMessage, SocketDataBean.EventMessage.class);
+                    //获取消息序列号，更新心跳
+                    s = eventMessage.getS();
+                    //获取事件类型，并进行判断
+                    t = eventMessage.getT();
 
+                }
                 switch (t) {
                     case "READY" -> {
                         //更新sessionId信息
@@ -76,10 +91,8 @@ public class webSocket2QQ extends WebSocketClient {
                         MorvenBotMain.LOGGER.info("重连成功~消息已补发");
                         isResumeFlag = false; //重连标记归位
                     }
-                    default -> {
-                        //其他事件处理
-                        EventHandler.handleEvent(t);
-                    }
+                    default -> //其他事件处理
+                            EventHandler.handleEvent(t, eventMessage);
                 }
             }
             case 7 -> {
@@ -97,12 +110,13 @@ public class webSocket2QQ extends WebSocketClient {
             }
             case 10 -> {
                 //当客户端与网关建立ws连接后，网关发送的第一条消息
-                if (isResumeFlag){
+                heartBeatInterval = getHeartBeatInterval(receiveMessage);
+                if (isResumeFlag) {
                     MorvenBotMain.LOGGER.debug("重启心跳机制！");
-                }else {
+                    startHeartbeatTask();
+                } else {
                     MorvenBotMain.LOGGER.info("登录成功！");
                 }
-                heartBeatInterval = getHeartBeatInterval(receiveMessage);
             }
             case 11 ->
                 //发送心跳成功后收到该消息
@@ -132,8 +146,11 @@ public class webSocket2QQ extends WebSocketClient {
     }
 
     private void startHeartbeatTask() {
-        //心跳任务
         if (heartBeatInterval > 0) {
+            // 如果heartBeatTask已关闭或终止，则重新初始化
+            if (heartBeatTask.isShutdown() || heartBeatTask.isTerminated()) {
+                heartBeatTask = Executors.newSingleThreadScheduledExecutor();
+            }
             heartBeatTask.scheduleAtFixedRate(this::postHeartbeat,
                     0,
                     heartBeatInterval,
@@ -185,9 +202,9 @@ public class webSocket2QQ extends WebSocketClient {
 
     @Override
     public void onClose(int i, String s, boolean b) {
+        heartBeatTask.shutdown();//关闭定时任务
         if (isResumeFlag) {
             MorvenBotMain.LOGGER.info("正在重新连接到QQ服务器！");
-            heartBeatTask.shutdown();//关闭定时任务
 
             // 使用线程池来处理重连任务
             Executors.newSingleThreadExecutor().submit(() -> {
@@ -200,7 +217,6 @@ public class webSocket2QQ extends WebSocketClient {
 
         } else {
 
-            heartBeatTask.shutdown();//关闭定时任务
             MorvenBotMain.LOGGER.info("连接断开");
         }
 
@@ -209,7 +225,6 @@ public class webSocket2QQ extends WebSocketClient {
     @Override
     public void onError(Exception e) {
         MorvenBotMain.LOGGER.error("连接出错", e);
-        Resume();
     }
 
 }

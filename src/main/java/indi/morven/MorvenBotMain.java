@@ -19,7 +19,7 @@ public class MorvenBotMain {
     public static void main(String[] args) {
         //设置初始化
         config();
-        //启动websocket客户端，建立连接
+        //启动websocket客户端
         webSocket2QQ qqBotEventSocket = null;
         try {
             qqBotEventSocket = new webSocket2QQ(new URI(GetWssURL.wssUrl(GlobalConfig.getAUTHORIZATION())));
@@ -27,6 +27,7 @@ public class MorvenBotMain {
             LOGGER.error("与QQ服务器建立连接失败，请检查网络连接",e);
         }
         if (qqBotEventSocket != null) {
+            //建立连接
             qqBotEventSocket.connect();
         }
     }
