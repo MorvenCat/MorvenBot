@@ -1,19 +1,20 @@
 package indi.morven.connect2qq;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
 
 public class SocketDataBean {
     /**
-      *  op 指的是 opcode，全部 opcode 列表参考 opcode
-      *  (https://bot.q.qq.com/wiki/develop/api-231017/dev-prepare/interface-framework/event-emit.html#websocket-%E6%96%B9%E5%BC%8F)。
-      *  s下行消息都会有一个序列号，标识消息的唯一性，客户端需要再发送心跳的时候，携带客户端收到的最新的s。
-      *  t和d 主要是用在op为 0 Dispatch 的时候，
-      *  t 代表事件类型，
-      *  d 代表事件内容，
-      *  不同事件类型的事件内容格式都不同，请注意识别。
-      **/
+     * op 指的是 opcode，全部 opcode 列表参考 opcode
+     * (https://bot.q.qq.com/wiki/develop/api-231017/dev-prepare/interface-framework/event-emit.html#websocket-%E6%96%B9%E5%BC%8F)。
+     * s下行消息都会有一个序列号，标识消息的唯一性，客户端需要再发送心跳的时候，携带客户端收到的最新的s。
+     * t和d 主要是用在op为 0 Dispatch 的时候，
+     * t 代表事件类型，
+     * d 代表事件内容，
+     * 不同事件类型的事件内容格式都不同，请注意识别。
+     **/
 
     //消息类
     public static class BaseMessage {
@@ -33,36 +34,8 @@ public class SocketDataBean {
         public void setOpCode(int opCode) {
             this.opCode = opCode;
         }
-    }
 
-    // Hello类
-    public static class HelloMessage extends BaseMessage {
-        @SerializedName("d")
-        private d d;
 
-        public HelloMessage(int opCode) {
-            super(opCode);
-        }
-
-        public d getD() {
-            return d;
-        }
-
-        public void setD(d d) {
-            this.d = d;
-        }
-
-        //d 内部定义
-        public static class d {
-            @SerializedName("heartbeat_interval")
-            private int heartBeatInterval;  //获取心跳周期
-            public int getHeartBeatInterval() {
-                return heartBeatInterval;
-            }
-            public void setHeartBeatInterval(int heartBeatInterval) {
-                this.heartBeatInterval = heartBeatInterval;
-            }
-        }
     }
 
     // 事件消息类型
@@ -77,90 +50,10 @@ public class SocketDataBean {
         private String id;
 
         @SerializedName("d")
-        private d d;
+        private JsonObject d;
 
         public EventMessage(int opCode) {
             super(opCode);
-        }
-
-        public static class d {
-            @SerializedName("version")
-            private String version;
-
-            @SerializedName("user")
-            private user user;
-
-            @SerializedName("session_id")
-            private String session_id;
-
-            @SerializedName("shard")
-            private int[] id;
-
-
-            public static class user {
-                @SerializedName("id")
-                private String id;
-                @SerializedName("username")
-                private String username;
-                @SerializedName("bot")
-                private String bot;
-
-                public String getId() {
-                    return id;
-                }
-
-                public void setId(String id) {
-                    this.id = id;
-                }
-
-                public String getUsername() {
-                    return username;
-                }
-
-                public void setUsername(String username) {
-                    this.username = username;
-                }
-
-                public String getBot() {
-                    return bot;
-                }
-
-                public void setBot(String bot) {
-                    this.bot = bot;
-                }
-            }
-
-            public String getVersion() {
-                return version;
-            }
-
-            public void setVersion(String version) {
-                this.version = version;
-            }
-
-            public EventMessage.d.user getUser() {
-                return user;
-            }
-
-            public void setUser(EventMessage.d.user user) {
-                this.user = user;
-            }
-
-            public String getSession_id() {
-                return session_id;
-            }
-
-            public void setSession_id(String session_id) {
-                this.session_id = session_id;
-            }
-
-            public int[] getId() {
-                return id;
-            }
-
-            public void setId(int[] id) {
-                this.id = id;
-            }
         }
 
         public int getS() {
@@ -187,6 +80,24 @@ public class SocketDataBean {
             this.id = id;
         }
 
+        public JsonObject getD() {
+            return d;
+        }
+
+        public void setD(JsonObject d) {
+            this.d = d;
+        }
+    }
+
+    // Hello类
+    public static class HelloMessage extends BaseMessage {
+        @SerializedName("d")
+        private d d;
+
+        public HelloMessage(int opCode) {
+            super(opCode);
+        }
+
         public d getD() {
             return d;
         }
@@ -194,6 +105,21 @@ public class SocketDataBean {
         public void setD(d d) {
             this.d = d;
         }
+
+        //d 内部定义
+        public static class d {
+            @SerializedName("heartbeat_interval")
+            private int heartBeatInterval;  //获取心跳周期
+
+            public int getHeartBeatInterval() {
+                return heartBeatInterval;
+            }
+
+            public void setHeartBeatInterval(int heartBeatInterval) {
+                this.heartBeatInterval = heartBeatInterval;
+            }
+        }
+
     }
 
     // 鉴权消息类
@@ -323,6 +249,86 @@ public class SocketDataBean {
 
         public void setD(ResumeMessage.d d) {
             this.d = d;
+        }
+    }
+
+    public static class d {
+        @SerializedName("version")
+        private String version;
+
+        @SerializedName("user")
+        private user user;
+
+        @SerializedName("session_id")
+        private String session_id;
+
+        @SerializedName("shard")
+        private int[] id;
+
+
+        public static class user {
+            @SerializedName("id")
+            private String id;
+            @SerializedName("username")
+            private String username;
+            @SerializedName("bot")
+            private boolean bot;
+
+            public String getId() {
+                return id;
+            }
+
+            public void setId(String id) {
+                this.id = id;
+            }
+
+            public String getUsername() {
+                return username;
+            }
+
+            public void setUsername(String username) {
+                this.username = username;
+            }
+
+            public boolean getBot() {
+                return bot;
+            }
+
+            public void setBot(boolean bot) {
+                this.bot = bot;
+            }
+        }
+
+        public String getVersion() {
+            return version;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
+        }
+
+        public d.user getUser() {
+            return user;
+        }
+
+        public void setUser(d.user user) {
+            this.user = user;
+        }
+
+        public String getSession_id() {
+            return session_id;
+        }
+
+        public void setSession_id(String session_id) {
+            this.session_id = session_id;
+        }
+
+        public int[] getId() {
+            return id;
+        }
+
+        public void setId(int[] id) {
+            this.id = id;
         }
     }
 }

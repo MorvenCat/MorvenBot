@@ -78,11 +78,13 @@ public class webSocket2QQ extends WebSocketClient {
                     //获取事件类型，并进行判断
                     t = eventMessage.getT();
 
+
                 }
                 switch (t) {
                     case "READY" -> {
+                        SocketDataBean.d d = gson.fromJson(eventMessage.getD(),SocketDataBean.d.class);
                         //更新sessionId信息
-                        session_id = eventMessage.getD().getSession_id();
+                        session_id = d.getSession_id();
                         //启用定时发送心跳包
                         startHeartbeatTask();
                     }
@@ -92,7 +94,7 @@ public class webSocket2QQ extends WebSocketClient {
                         isResumeFlag = false; //重连标记归位
                     }
                     default -> //其他事件处理
-                            EventHandler.handleEvent(t, eventMessage);
+                            EventHandler.handleEvent(t, eventMessage.getD());
                 }
             }
             case 7 -> {
