@@ -17,7 +17,7 @@ public class EventHandler {
                 String content = msg.getContent();
                 String channelid = msg.getChannel_id();
 
-                MorvenBotMain.LOGGER.info("【消息】【"+channelid+"】["+user+"]"+content);
+                MorvenBotMain.LOGGER.info("【频道消息】【"+channelid+"】["+user+"]"+content);
 
 
             }
