@@ -12,25 +12,24 @@ public interface QQbotAPI {
     /**
      *
      */
-    @POST("/app/getAppAccessToken")
     //获取token
+    @POST("/app/getAppAccessToken")
     Call<Response> getAccessToken(@Body channelsMsg request);
 
-
+    //文字子频道
     @POST("/channels/{channel_id}/messages")
-        //文字子频道
     Call<channelsMsg> channelsMsg(@Body channelsMsg request, @Path("channel_id") String id);
 
+    //单聊
     @POST("/v2/users/{openid}/messages")
-        //单聊
     Call<Response> userMsg(@Body userMsg request, @Path("openid") String id);
 
+    //群聊
     @POST("/v2/groups/{group_openid}/messages")
-        //群聊
     Call<Response> groupsMsg(@Body groupsMsg request, @Path("group_openid") String id);
 
+    //频道私信
     @POST("/dms/{guild_id}/messages")
-        //频道私信
     Call<Response> dmsMsg(@Body dmsMsg request, @Path("guild_id") String id);
 
 }
