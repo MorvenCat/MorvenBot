@@ -6,6 +6,9 @@ import indi.morven.Event.MassageEvent.Message;
 import indi.morven.MorvenBotMain;
 import indi.morven.QQbotApi.QQbotAPI;
 import indi.morven.QQbotApi.SendMsg.channelsMsg;
+import indi.morven.QQbotApi.Token.TokenRequest;
+import indi.morven.QQbotApi.Token.TokenResponse;
+import indi.morven.config.GlobalConfig;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -20,7 +23,13 @@ public class EventHandler {
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
+    //创建网络请求接口的实例
+    private static final QQbotAPI demo = retrofit.create(QQbotAPI.class);
+
     public static void handleEvent(String t, JsonObject eventMessage) {
+
+        //定时任务，获取token
+
 
         switch (t) {
             case "MESSAGE_CREATE" -> {
@@ -34,14 +43,15 @@ public class EventHandler {
 
                 channelsMsg fuduji = new channelsMsg(content, msgid);
 
-                //创建网络请求接口的实例
-                QQbotAPI demo = retrofit.create(QQbotAPI.class);
+
+                //复读
                 //封装发送请求
                 Call<channelsMsg> call = demo.channelsMsg(fuduji, channelid);
                 //发送请求
                 try {
+                    MorvenBotMain.LOGGER.debug("发送请求\n" + call);
                     Response<channelsMsg> execute = call.execute();
-                    MorvenBotMain.LOGGER.debug("返回包\n"+execute);
+                    MorvenBotMain.LOGGER.debug("返回包\n" + execute);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -52,6 +62,21 @@ public class EventHandler {
             }
             case "" -> {
             }
+
         }
     }
+
+    public static void getToken() {
+        TokenRequest TokenRequest = new TokenRequest(GlobalConfig.getAppId(), GlobalConfig.getAppSecret());
+        Call<TokenResponse> token = demo.getToken(TokenRequest);
+
+        try {
+            MorvenBotMain.LOGGER.debug("发送请求\n" + token);
+            Response<TokenResponse> tokenResponse = token.execute();
+            MorvenBotMain.LOGGER.debug("返回包\n" + tokenResponse);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

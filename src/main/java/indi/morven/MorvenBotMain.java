@@ -1,11 +1,13 @@
 package indi.morven;
 
 
+import indi.morven.QQbotApi.Token.TokenRequest;
 import indi.morven.connect2qq.GetWssURL;
 import indi.morven.config.GlobalConfig;
 import indi.morven.connect2qq.webSocket2QQ;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import retrofit2.Call;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,6 +21,7 @@ public class MorvenBotMain {
     public static void main(String[] args) {
         //设置初始化
         config();
+
         //启动websocket客户端
         webSocket2QQ qqBotEventSocket = null;
         try {
@@ -31,4 +34,6 @@ public class MorvenBotMain {
             qqBotEventSocket.connect();
         }
     }
+
+
 }
